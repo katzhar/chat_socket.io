@@ -3,8 +3,8 @@ import io from 'socket.io-client'
 import TextField from '@material-ui/core/TextField'
 import './css/App.css'
 
-const token = localStorage.token;
-const socket = io.connect('http://localhost:3001', {
+const token = localStorage.getItem('token')
+const socket = io('http://localhost:3001', {
   query: { token }
 });
 

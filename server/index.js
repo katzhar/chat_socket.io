@@ -6,8 +6,9 @@ const app = require('express'),
 
 io.use((socket, next) => {
   if (socket.handshake.query && socket.handshake.query.token) {
-    const token = socket.handshake.query.token
+    const token = socket.handshake.query.token;
     jwt.verify(token.toString(), process.env.SECRET_KEY, (err, decoded) => {
+      console.log(decoded);
       if (err) return next(new Error('Authentication error'));
       socket.decoded = decoded;
       next();
@@ -22,3 +23,7 @@ io.use((socket, next) => {
       io.emit('message', { name, message })
     })
   });
+
+http.listen(3001, () => {
+  console.log('listening on port 3001')
+})
