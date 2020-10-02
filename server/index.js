@@ -1,13 +1,24 @@
+require('dotenv/config');
 const app = require('express'),
   http = require('http').createServer(app),
-  io = require('socket.io')(http)
+  jwt = require('jsonwebtoken'),
+  io = require('socket.io')(http);
 
-io.on('connection', socket => {
-  socket.on('message', ({ name, message }) => {
-    io.emit('message', { name, message })
-  })
+io.use((socket, next) => {
+  if (socket.handshake.query && socket.handshake.query.token) {
+    const token = socket.handshake.query.token
+    jwt.verify(token.toString(), process.env.SECRET_KEY, { algorithms: ['HS512'] }, (err, decoded) => {
+      if (err) return next(new Error('Authentication error'));
+      socket.decoded = decoded;
+      next();
+    });
+  }
+  else {
+    next(new Error('Authentication error'));
+  }
 })
-
-http.listen(3001, () => {
-  console.log('listening on port 3001')
-})
+  .on('connection', (socket) => {
+    socket.on('message', ({ name, message }) => {
+      io.emit('message', { name, message })
+    })
+  });
