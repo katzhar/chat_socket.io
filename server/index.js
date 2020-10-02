@@ -8,7 +8,6 @@ io.use((socket, next) => {
   if (socket.handshake.query && socket.handshake.query.token) {
     const token = socket.handshake.query.token;
     jwt.verify(token.toString(), process.env.SECRET_KEY, (err, decoded) => {
-      console.log(decoded);
       if (err) return next(new Error('Authentication error'));
       socket.decoded = decoded;
       next();
